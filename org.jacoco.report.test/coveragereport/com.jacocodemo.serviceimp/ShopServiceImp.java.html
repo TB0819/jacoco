@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ShopServiceImp.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jacocoTest</a> &gt; <a href="index.source.html" class="el_package">com.jacocodemo.serviceimp</a> &gt; <span class="el_source">ShopServiceImp.java</span></div><h1>ShopServiceImp.java</h1><pre class="source lang-java linenums">+ package com.jacocodemo.serviceimp;
++ 
++ import com.jacocodemo.bean.Shop;
++ import com.jacocodemo.service.ShopService;
++ import org.springframework.stereotype.Service;
++ 
++ import java.util.ArrayList;
++ import java.util.List;
++ import java.util.UUID;
++ 
++ @Service
++ public class ShopServiceImp implements ShopService {
++     private static List&lt;Shop&gt; shops = new ArrayList&lt;&gt;();
++ 
++     @Override
++     public Shop getShop(String id) {
+<span class="nc bnc" id="L17" title="All 2 branches missed.">+         for (Shop shop: shops) {</span>
+<span class="nc bnc" id="L18" title="All 2 branches missed.">+             if (shop.getId().equals(id)) {</span>
+<span class="nc" id="L19">+                 return shop;</span>
++             }
+<span class="nc" id="L21">+         }</span>
+<span class="nc" id="L22">+         return null;</span>
++     }
++ 
++     @Override
++     public List&lt;Shop&gt; getShopList() {
+<span class="nc" id="L27">+         return shops;</span>
++     }
++ 
++     @Override
++     public void addShop(String name, String address, String mobile) {
+<span class="nc" id="L32">+         Shop shop = new Shop();</span>
+<span class="nc" id="L33">+         shop.setAddress(address);</span>
+<span class="nc" id="L34">+         shop.setMobile(mobile);</span>
+<span class="nc" id="L35">+         shop.setName(name);</span>
+<span class="nc" id="L36">+         shop.setId(String.valueOf(UUID.randomUUID()));</span>
+<span class="nc" id="L37">+     }</span>
++ }
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> $qualified.bundle.version$</span></div></body></html>

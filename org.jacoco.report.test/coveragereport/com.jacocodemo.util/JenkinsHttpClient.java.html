@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JenkinsHttpClient.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jacocoTest</a> &gt; <a href="index.source.html" class="el_package">com.jacocodemo.util</a> &gt; <span class="el_source">JenkinsHttpClient.java</span></div><h1>JenkinsHttpClient.java</h1><pre class="source lang-java linenums">package com.jacocodemo.util;
+
+import com.google.gson.JsonObject;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.Map;
+
+<span class="nc" id="L17">public class JenkinsHttpClient {</span>
+    private static final String CHARSET_UTF_8 = &quot;utf-8&quot;;
+    private static final String STATUS = &quot;Status&quot;;
+    private static final String CONTENTTYPE = &quot;ContentType&quot;;
+    private static final String BODY = &quot;body&quot;;
+<span class="nc" id="L22">    private JsonObject responseResult = new JsonObject();</span>
+
+    /**
+     * 以get方式请求Jenkins api
+     * @param url
+     * @param headerMap
+     * @param urlParams
+     * @return
+     */
+    public JsonObject doGet(String url, Map&lt;String, String&gt; headerMap, Map&lt;String, String&gt; urlParams) {
+<span class="nc" id="L32">        CloseableHttpResponse response = null;</span>
+<span class="nc" id="L33">        HttpGet httpGet = null;</span>
+        try {
+            //创建HttpClient对象，HttpClients.createDefault()
+<span class="nc" id="L36">            CloseableHttpClient httpClient = HttpClients.createDefault();</span>
+            //构建url中的请求参数
+<span class="nc bnc" id="L38" title="All 4 branches missed.">            if (urlParams != null &amp;&amp; !urlParams.isEmpty()){</span>
+<span class="nc" id="L39">                String params = toHttpGetParams(urlParams);</span>
+<span class="nc" id="L40">                url = url + &quot;?&quot; + params;</span>
+            }
+            //基于要发送的HTTP请求类型创建HttpGet或者HttpPost实例
+<span class="nc" id="L43">            httpGet = new HttpGet(url);</span>
+            //get请求，添加header
+<span class="nc bnc" id="L45" title="All 4 branches missed.">            if (headerMap != null &amp;&amp; !headerMap.isEmpty()) {</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">                for (Map.Entry&lt;String, String&gt; entry : headerMap.entrySet()) {</span>
+<span class="nc" id="L47">                    httpGet.addHeader(entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L48">                }</span>
+            }
+            //设置连接超时
+<span class="nc" id="L51">            httpGet.setConfig(setRequestConfig());</span>
+            //发起请求
+<span class="nc" id="L53">            response = httpClient.execute(httpGet);</span>
+            //获取返回结果
+<span class="nc" id="L55">            return getResponse(response);</span>
+<span class="nc" id="L56">        } catch (Exception e) {</span>
+<span class="nc" id="L57">            String msg = &quot;网络出错, 可能的原因是: 您的网络不通, 或者服务器停掉了! 请求URL &gt;&gt;&gt;:&quot; + url;</span>
+        }finally {
+            //关闭连接
+<span class="nc" id="L60">            closeResponse(response);</span>
+        }
+<span class="nc" id="L62">        return null;</span>
+    }
+
+    /**
+     * 这里只是其中的一种场景,也就是把参数用&amp;符号进行连接且进行URL编码
+     * 根据实际情况拼接参数
+     */
+    private String toHttpGetParams(Map&lt;String, String&gt; urlParams) throws Exception {
+<span class="nc" id="L70">        String res = &quot;&quot;;</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">        for (Map.Entry&lt;String, String&gt; entry : urlParams.entrySet()) {</span>
+<span class="nc" id="L72">            res += entry.getKey() + &quot;=&quot; + URLEncoder.encode(entry.getValue(), CHARSET_UTF_8) + &quot;&amp;&quot;;</span>
+<span class="nc" id="L73">        }</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        return &quot;&quot;.equals(res) ? &quot;&quot; : StringUtils.chop(res);</span>
+    }
+
+    /**
+     * 设置连接超时信息
+     * @return
+     */
+    private RequestConfig setRequestConfig(){
+        /*设置连接超时
+        setConnectTimeout：设置连接超时时间，单位毫秒。
+        setConnectionRequestTimeout：设置从connect Manager(连接池)获取Connection 超时时间，单位毫秒。这个属性是新加的属性，因为目前版本是可以共享连接池的。
+        setSocketTimeout：请求获取数据的超时时间(即响应时间)，单位毫秒。 如果访问一个接口，多少时间内无法返回数据，就直接放弃此次调用。
+        */
+<span class="nc" id="L87">        RequestConfig requestConfig = RequestConfig.custom()</span>
+<span class="nc" id="L88">                .setConnectTimeout(5000)</span>
+<span class="nc" id="L89">                .setConnectionRequestTimeout(1000)</span>
+<span class="nc" id="L90">                .setSocketTimeout(5000)</span>
+<span class="nc" id="L91">                .build();</span>
+<span class="nc" id="L92">        return  requestConfig;</span>
+    }
+
+    /**
+     * 获取Response信息,返回结果以jsonObject形式
+     * @param response
+     * @return
+     */
+    private JsonObject getResponse(CloseableHttpResponse response){
+<span class="nc" id="L101">        HttpEntity entity = response.getEntity();</span>
+        try {
+<span class="nc" id="L103">            this.responseResult.addProperty(STATUS,response.getStatusLine().getStatusCode());</span>
+<span class="nc" id="L104">            this.responseResult.addProperty(CONTENTTYPE,entity.getContentType().getValue());</span>
+<span class="nc" id="L105">            String result = EntityUtils.toString(entity, CHARSET_UTF_8);</span>
+<span class="nc" id="L106">            this.responseResult.addProperty(BODY, result);</span>
+            //关闭HttpEntity
+<span class="nc" id="L108">            EntityUtils.consume(entity);</span>
+<span class="nc" id="L109">        } catch (IOException e) {</span>
+<span class="nc" id="L110">            System.err.println(&quot;HttpEntity关闭失败, &quot; + e);</span>
+<span class="nc" id="L111">        }</span>
+<span class="nc" id="L112">        return this.responseResult;</span>
+    }
+
+    /**
+     * 关闭连接
+     * @param response
+     */
+    private void closeResponse(CloseableHttpResponse response){
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        if (response != null) {</span>
+            try {
+<span class="nc" id="L122">                response.close();</span>
+                //不可以关闭，不然连接池就会被关闭
+                //httpclient.close();
+<span class="nc" id="L125">            } catch (IOException e) {</span>
+<span class="nc" id="L126">                System.err.println(&quot;httpClient关闭连接失败, &quot; + e);</span>
+<span class="nc" id="L127">            }</span>
+        }
+<span class="nc" id="L129">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> $qualified.bundle.version$</span></div></body></html>
