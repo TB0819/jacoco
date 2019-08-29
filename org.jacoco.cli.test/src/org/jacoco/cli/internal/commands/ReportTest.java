@@ -148,4 +148,19 @@ public class ReportTest extends CommandTestBase {
 						.isFile());
 	}
 
+	@Test
+	public void testGitDiffReport()
+			throws Exception {
+		execute("report", "****/jacoco.exec"
+				, "--classfiles" , "****/classes"
+				, "--html" , "****//report-diff-jar/"
+				, "--name" , "report-diff"
+				, "--sourcefiles" , "****//src/main/java"
+				, "--gitusername" , "****"
+				, "--gitpsw" , "****"
+				, "--gitpath" , "projectlocalpath"
+				, "--newbranchname" , "newbranchname"
+				, "--oldbranchname" , "oldbranchname");
+	}
+
 }
