@@ -146,3 +146,6 @@ private IBundleCoverage analyzeStructure() throws IOException {
 
         return coverageBuilder.getBundle(title);
 ```
+
+### 打包构建
+org.jacoco.core模块依赖org.eclipse.jdt.core包的版本下属的依赖包需在jdk11编译，因此需跟换3.10.0
